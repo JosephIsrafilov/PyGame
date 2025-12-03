@@ -2,7 +2,6 @@ import math
 import random
 from pygame import Rect
 from pgzero.actor import Actor
-from collections import deque
 
 
 TITLE = "Forest Relic"
@@ -954,22 +953,23 @@ def has_line_of_sight(a, b, walls, steps=10):
 
 def reachable_positions(start, walls, step=24, margin=18):
     start_cell = (int(start[0] // step), int(start[1] // step))
-    visited = set()
-    q = deque([start_cell])
-    visited.add(start_cell)
+    visited = {start_cell}
+    queue = [start_cell]
     results = []
-    while q:
-        cx, cy = q.popleft()
+    idx = 0
+    while idx < len(queue):
+        cx, cy = queue[idx]
+        idx += 1
         x = cx * step + step / 2
         y = cy * step + step / 2
         if margin <= x <= WIDTH - margin and margin <= y <= HEIGHT - margin:
             if not any(Rect(w).collidepoint(x, y) for w in walls):
                 results.append((x, y))
                 for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
-                    nx, ny = cx + dx, cy + dy
-                    if (nx, ny) not in visited:
-                        visited.add((nx, ny))
-                        q.append((nx, ny))
+                    nxt = (cx + dx, cy + dy)
+                    if nxt not in visited:
+                        visited.add(nxt)
+                        queue.append(nxt)
     return results
 
 
