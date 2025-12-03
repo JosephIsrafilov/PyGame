@@ -8,7 +8,7 @@ Top-down, room-clear built with Pygame Zero. Grab every gem, wipe every enemy, a
 - Prefer `python main.py`? Append `import pgzrun; pgzrun.go()` at the bottom first.
 
 ## Controls
-- Move: Arrow keys
+- Move: WASD
 - Shoot: Left click toward the aim
 - Reload: R
 - Menu: Click buttons; ESC to return to menu mid-run
