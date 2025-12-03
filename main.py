@@ -104,8 +104,8 @@ class Player(Character):
         self.reload_timer = 0.0
 
     def update(self, dt, walls):
-        dx = keyboard.right - keyboard.left
-        dy = keyboard.down - keyboard.up
+        dx = (keyboard.right or keyboard.d) - (keyboard.left or keyboard.a)
+        dy = (keyboard.down or keyboard.s) - (keyboard.up or keyboard.w)
         if dx or dy:
             length = math.hypot(dx, dy)
             dx /= length
