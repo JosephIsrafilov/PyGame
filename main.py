@@ -1,7 +1,7 @@
 import math
 import random
-from pygame import Rect
 from pgzero.actor import Actor
+from rect_stub import Rect
 
 
 TITLE = "Forest Relic"
@@ -34,6 +34,36 @@ FLOOR_LIGHT = (32, 60, 66)
 
 def clamp(value, minimum, maximum):
     return max(minimum, min(value, maximum))
+
+
+def rect_points(r):
+    x, y, w, h = r.x, r.y, r.width, r.height
+    return [(x, y), (x + w, y), (x + w, y + h), (x, y + h)]
+
+
+def fill_rect(r, color):
+    x0 = int(r.x)
+    y0 = int(r.y)
+    x1 = int(r.x + r.width)
+    y1 = int(r.y + r.height)
+    for y in range(y0, y1):
+        screen.draw.line((x0, y), (x1, y), color)
+
+
+def outline_rect(r, color, width=1):
+    pts = rect_points(r)
+    for i in range(width):
+        offset = i
+        inner = [
+            (pts[0][0] + offset, pts[0][1] + offset),
+            (pts[1][0] - offset, pts[1][1] + offset),
+            (pts[2][0] - offset, pts[2][1] - offset),
+            (pts[3][0] + offset, pts[3][1] - offset),
+        ]
+        for j in range(4):
+            a = inner[j]
+            b = inner[(j + 1) % 4]
+            screen.draw.line(a, b, color)
 
 
 class SpriteAnimation:
@@ -359,8 +389,8 @@ class Button:
             hovered = False
         base_color = (70, 110, 160) if hovered else (50, 80, 130)
         border = (255, 255, 255) if hovered else (210, 220, 240)
-        screen.draw.filled_rect(self.rect, base_color)
-        screen.draw.rect(self.rect, border)
+        fill_rect(self.rect, base_color)
+        outline_rect(self.rect, border)
         screen.draw.text(
             self.text,
             center=self.rect.center,
@@ -691,8 +721,8 @@ def draw_playfield():
     draw_floor_pattern()
     draw_fireflies()
     for wall in walls:
-        screen.draw.filled_rect(wall, (62, 92, 115))
-        screen.draw.rect(wall, (30, 45, 60))
+        fill_rect(wall, (62, 92, 115))
+        outline_rect(wall, (30, 45, 60))
 
     draw_exit()
 
@@ -743,15 +773,15 @@ def draw_background():
         r = int(SKY_TOP[0] * (1 - t) + SKY_BOTTOM[0] * t)
         g = int(SKY_TOP[1] * (1 - t) + SKY_BOTTOM[1] * t)
         b = int(SKY_TOP[2] * (1 - t) + SKY_BOTTOM[2] * t)
-        screen.draw.filled_rect(Rect((0, i * HEIGHT // 16), (WIDTH, HEIGHT // 16 + 1)), (r, g, b))
-    screen.draw.filled_rect(Rect((0, HEIGHT // 3), (WIDTH, HEIGHT)), FLOOR_DARK)
-    screen.draw.filled_rect(Rect((0, HEIGHT * 2 // 3), (WIDTH, HEIGHT // 3)), FLOOR_LIGHT)
+        fill_rect(Rect((0, i * HEIGHT // 16), (WIDTH, HEIGHT // 16 + 1)), (r, g, b))
+    fill_rect(Rect((0, HEIGHT // 3), (WIDTH, HEIGHT)), FLOOR_DARK)
+    fill_rect(Rect((0, HEIGHT * 2 // 3), (WIDTH, HEIGHT // 3)), FLOOR_LIGHT)
 
 
 def draw_floor_pattern():
     for y in range(0, HEIGHT, 24):
         color = (30, 52, 58) if (y // 24) % 2 == 0 else (36, 60, 66)
-        screen.draw.filled_rect(Rect((0, y), (WIDTH, 24)), color)
+        fill_rect(Rect((0, y), (WIDTH, 24)), color)
     for x in range(0, WIDTH, 48):
         screen.draw.line((x, 0), (x, HEIGHT), (20, 40, 46))
 
@@ -861,21 +891,21 @@ def draw_hud():
 
 def draw_banner(text, color):
     cover = Rect((40, HEIGHT // 2 - 50), (WIDTH - 80, 100))
-    screen.draw.filled_rect(cover, (12, 16, 18))
-    screen.draw.rect(cover, (230, 230, 230))
-    screen.draw.text(text, center=cover.center, fontsize=30, color=color)
+    fill_rect(cover, (12, 16, 18))
+    outline_rect(cover, (230, 230, 230))
+    screen.draw.text(text, center=(cover.centerx, cover.centery), fontsize=30, color=color)
 
 
 def draw_exit():
     img = "exit_open" if exit_unlocked else "exit_closed"
     pos = (exit_rect.left, exit_rect.top)
-    screen.draw.rect(exit_rect, (50, 36, 20))
+    outline_rect(exit_rect, (50, 36, 20))
     if exit_unlocked:
         glow = 10 + math.sin(game_time * 6) * 4
-        screen.draw.rect(exit_rect.inflate(glow, glow), (230, 210, 120))
-        screen.draw.filled_rect(exit_rect.inflate(glow * 1.2, glow * 1.2), (24, 24, 18))
+        outline_rect(exit_rect.inflate(glow, glow), (230, 210, 120))
+        fill_rect(exit_rect.inflate(glow * 1.2, glow * 1.2), (24, 24, 18))
     else:
-        screen.draw.rect(exit_rect.inflate(6, 6), (30, 20, 10))
+        outline_rect(exit_rect.inflate(6, 6), (30, 20, 10))
     screen.blit(img, pos)
 
 
